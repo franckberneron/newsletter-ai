@@ -10,7 +10,7 @@
 #     if request.method == "POST":
 #         email = request.form["email"]
 #         topics = request.form.getlist("topics")
-        
+
 #         # Send data to FastAPI backend
 #         response = requests.post(
 #             f"{BACKEND_URL}/api/users",
@@ -19,13 +19,13 @@
 #                 "preferences": {"topics": topics}
 #             }
 #         )
-        
+
 #         if response.status_code == 200:
 #             return redirect(url_for("success"))
 #         else:
 #             error = response.json().get("detail", "Signup failed")
 #             return render_template("signup.html", error=error)
-    
+
 #     return render_template("signup.html")
 
 # @app.route("/success")
@@ -42,7 +42,7 @@ import json
 app = Flask(__name__)
 
 # Backend API URL
-BACKEND_URL = "http://localhost:8000/api/users"
+BACKEND_URL = "http://backend:8000/api/users"
 
 @app.route("/", methods=["GET"])
 def index():
@@ -74,9 +74,9 @@ def subscribe():
 
         # Return backend response to frontend
         return jsonify(response.json())
-    
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run(debug=True, host="0.0.0.0", port=5000)

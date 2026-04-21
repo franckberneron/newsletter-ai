@@ -1,4 +1,3 @@
-version: '3'
 services:
   postgres:
     image: postgres:15
@@ -18,6 +17,48 @@ services:
       - "6334:6334"
     volumes:
       - qdrant_data:/qdrant/storage
+
+  backend:
+    image: python:3.12-slim
+    working_dir: /app/backend
+    volumes:
+      - ./:/app
+    env_file:
+      - .env
+    environment:
+      POSTGRES_HOST: postgres
+      PIP_REQUIRE_HASHES: "0"
+      PIP_NO_CACHE_DIR: "1"
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      PIP_CONFIG_FILE: /dev/null
+    depends_on:
+      - postgres
+      - qdrant
+    command: >
+      sh -c "pip install --no-cache-dir -r /app/requirements.txt &&
+             uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+    ports:
+      - "8000:8000"
+
+  frontend:
+    image: python:3.12-slim
+    working_dir: /app/frontend
+    volumes:
+      - ./:/app
+    env_file:
+      - .env
+    environment:
+      PIP_REQUIRE_HASHES: "0"
+      PIP_NO_CACHE_DIR: "1"
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      PIP_CONFIG_FILE: /dev/null
+    depends_on:
+      - backend
+    command: >
+      sh -c "pip install --no-cache-dir -r /app/requirements.txt &&
+             python app.py"
+    ports:
+      - "5000:5000"
 
 volumes:
   postgres_data:
