@@ -1,17 +1,23 @@
 # services/user_manager.py
 import os
+from pathlib import Path
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from models.user_model import Base, User
+
+ENV_PATH = Path(__file__).resolve().parents[1] / ".env"
+load_dotenv(dotenv_path=ENV_PATH, override=True)
 
 # Database configuration
 DB_USER = os.getenv("POSTGRES_USER", "newsletterai")
 DB_PASS = os.getenv("POSTGRES_PASSWORD", "yourpassword")
 DB_NAME = os.getenv("POSTGRES_DB", "newsletterai")
 DB_HOST = os.getenv("POSTGRES_HOST", "localhost")
+DB_PORT = os.getenv("POSTGRES_PORT", "5432")
 
 # SQLAlchemy setup
-DATABASE_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}"
+DATABASE_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
